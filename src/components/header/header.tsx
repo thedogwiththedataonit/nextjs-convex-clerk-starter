@@ -2,8 +2,6 @@
 //create a header component with clerk login and user button
 
 
-import { useUser } from "@clerk/nextjs";
-import { Button } from "../ui/button";
 import { UserButton, SignedIn, SignedOut , SignInButton} from "@clerk/nextjs";
 
 export default function Header() {

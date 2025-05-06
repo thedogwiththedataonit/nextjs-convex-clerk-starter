@@ -1,10 +1,8 @@
-import { currentUser } from '@clerk/nextjs/server'
 import { SignInButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Database, Shield, Zap } from "lucide-react";
 
 export default async function Home() {
-  const user = await currentUser();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
