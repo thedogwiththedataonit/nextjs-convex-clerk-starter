@@ -16,25 +16,15 @@ import {
 } from "@/components/ui/table";
 import { TaskFormDialog } from "@/components/TaskFormDialog";
 import { Pencil, Trash2 } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
+import { Task } from "@/lib/types";
 
-interface Task {
-  _id: Id<"tasks">;
-  taskId: string;
-  message: string;
-  action: string;
-  type: string;
-  userId: string;
-}
-
-export function TaskList() {
+export function TaskList({userId}: {userId: string}) {
   const [searchQuery, setSearchQuery] = useState("");
-  const { user } = useUser();
-  const tasks = useQuery(api.tasks.get) || [];
+  const tasks = useQuery(api.tasks.get, { userId }) || [];
   const deleteTask = useMutation(api.tasks.remove);
 
   // Filter tasks for the current user
-  const userTasks = tasks.filter((task: Task) => task.userId === user?.id);
+  const userTasks = tasks.filter((task: Task) => task.userId === userId);
   
   const filteredTasks = userTasks.filter((task: Task) =>
     Object.values(task).some((value) =>
@@ -43,14 +33,14 @@ export function TaskList() {
   );
 
   const handleDelete = async (id: Id<"tasks">) => {
-    await deleteTask({ id });
+    await deleteTask({ id, userId: userId });
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Tasks</h2>
-        <TaskFormDialog>
+        <TaskFormDialog userId={userId}>
           <Button>Add Task</Button>
         </TaskFormDialog>
       </div>
@@ -73,7 +63,7 @@ export function TaskList() {
               : "No tasks match your search."}
           </p>
           {userTasks.length === 0 && (
-            <TaskFormDialog>
+            <TaskFormDialog userId={userId}>
               <Button>Create Task</Button>
             </TaskFormDialog>
           )}
@@ -98,7 +88,7 @@ export function TaskList() {
                 <TableCell>{task.type}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <TaskFormDialog editingTask={task}>
+                    <TaskFormDialog editingTask={task} userId={userId}>
                       <Button variant="ghost" size="icon">
                         <Pencil className="h-4 w-4" />
                       </Button>

@@ -21,22 +21,16 @@ import {
 import { useState, useEffect } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-
-interface Task {
-  _id: Id<"tasks">;
-  taskId: string;
-  message: string;
-  action: string;
-  type: string;
-}
+import { Task } from "@/lib/types";
 
 interface TaskFormDialogProps {
   editingTask?: Task | null;
   onTaskAdded?: () => void;
   children?: React.ReactNode;
+  userId: string;
 }
 
-export function TaskFormDialog({ editingTask, onTaskAdded, children }: TaskFormDialogProps) {
+export function TaskFormDialog({ editingTask, onTaskAdded, children, userId }: TaskFormDialogProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     taskId: "",
@@ -66,10 +60,14 @@ export function TaskFormDialog({ editingTask, onTaskAdded, children }: TaskFormD
     if (editingTask) {
       await updateTask({
         id: editingTask._id,
+        userId: userId,
         ...formData,
       });
     } else {
-      await addTask(formData);
+      await addTask({
+        ...formData,
+        userId: userId,
+      });
     }
     setIsDialogOpen(false);
     setFormData({ taskId: "", message: "", action: "", type: "" });

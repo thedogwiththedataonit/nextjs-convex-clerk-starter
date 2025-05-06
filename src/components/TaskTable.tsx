@@ -10,14 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-
-interface Task {
-  _id: Id<"tasks">;
-  taskId: string;
-  message: string;
-  action: string;
-  type: string;
-}
+import { Task } from "@/lib/types";
 
 interface TaskTableProps {
   tasks: Task[];

@@ -1,90 +1,61 @@
-"use client";
-
-import { api } from "../../convex/_generated/api";
-import { useQuery, useMutation } from "convex/react";
-import { Id } from "../../convex/_generated/dataModel";
-import { useState } from "react";
-import { TaskTable } from "@/components/TaskTable";
-import { TaskFormDialog } from "@/components/TaskFormDialog";
-import { Input } from "@/components/ui/input";
+import { currentUser } from '@clerk/nextjs/server'
+import { SignInButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { ArrowRight, Database, Shield, Zap } from "lucide-react";
 
-interface Task {
-  _id: Id<"tasks">;
-  taskId: string;
-  message: string;
-  action: string;
-  type: string;
-}
-
-export default function Home() {
-  const tasks = useQuery(api.tasks.get);
-  const deleteTask = useMutation(api.tasks.remove);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
-
-  const handleDelete = async (id: Id<"tasks">) => {
-    await deleteTask({ id });
-  };
-
-  const handleEdit = (task: Task) => {
-    setEditingTask(task);
-  };
-
-  const handleTaskAdded = () => {
-    setEditingTask(null);
-  };
-
-  const filteredTasks = tasks?.filter(task => 
-    task.taskId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    task.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    task.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    task.type.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+export default async function Home() {
+  const user = await currentUser();
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center w-full max-w-6xl">
-        <div className="w-full flex justify-between items-center">
-          <div className="w-full max-w-md">
-            <Input
-              type="text"
-              placeholder="Search tasks..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <TaskFormDialog onTaskAdded={handleTaskAdded}>
-            <Button>Add New Task</Button>
-          </TaskFormDialog>
-        </div>
-
-        {filteredTasks && filteredTasks.length > 0 ? (
-          <>
-            <TaskTable 
-              tasks={filteredTasks} 
-              onDelete={handleDelete}
-              onEdit={handleEdit}
-            />
-            <TaskFormDialog 
-              editingTask={editingTask}
-              onTaskAdded={handleTaskAdded}
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
+      {/* Hero Section */}
+      <div className="container mx-auto px-4 py-20">
+        <div className="text-center space-y-8">
+          <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60 animate-gradient">
+            Next.js + Convex + Clerk
+          </h1>
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+            Build powerful, real-time applications with the perfect stack for modern web development
+          </p>
+          <div className="flex justify-center gap-4">
+            <SignInButton 
             >
-              <Button className="hidden">Edit Task</Button>
-            </TaskFormDialog>
-          </>
-        ) : (
-          <div className="w-full text-center py-12 bg-gray-50 rounded-lg">
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No tasks found</h3>
-            <p className="text-gray-500 mb-4">
-              {searchQuery ? "No tasks match your search criteria." : "Get started by adding your first task."}
-            </p>
-            <TaskFormDialog onTaskAdded={handleTaskAdded}>
-              <Button>Add New Task</Button>
-            </TaskFormDialog>
+              <Button size="lg" >
+                Get Started <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </SignInButton>
           </div>
-        )}
-      </main>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="container mx-auto px-4 py-20">
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="p-6 rounded-lg border bg-card hover:shadow-lg transition-all duration-300">
+            <Zap className="h-12 w-12 text-primary mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Real-time Updates</h3>
+            <p className="text-muted-foreground">
+              Convex provides instant, real-time updates across your application with zero configuration
+            </p>
+          </div>
+          
+          <div className="p-6 rounded-lg border bg-card hover:shadow-lg transition-all duration-300">
+            <Shield className="h-12 w-12 text-primary mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Secure Authentication</h3>
+            <p className="text-muted-foreground">
+              Clerk handles authentication with enterprise-grade security and beautiful UI components
+            </p>
+          </div>
+          
+          <div className="p-6 rounded-lg border bg-card hover:shadow-lg transition-all duration-300">
+            <Database className="h-12 w-12 text-primary mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Serverless Backend</h3>
+            <p className="text-muted-foreground">
+              Build your backend with TypeScript and deploy instantly with zero DevOps
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
